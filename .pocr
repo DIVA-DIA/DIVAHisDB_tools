@@ -1,0 +1,16 @@
+!Project
+_conda_name: hisDBViz
+_project_name: hisDBViz
+_project_path: /Users/voegtlil/Documents/10_Tools_and_scripts/hisDBViz
+_python_version: 3.5
+_repo_name: hisDBViz
+_repo_user: lvoegtlin
+_vcs: !VCS
+  _connection_types:
+  - !ConnectionType
+    _name: https
+    _url: https://github.com/
+  - !ConnectionType
+    _name: ssh
+    _url: 'git@github.com:'
+  _name: Github
