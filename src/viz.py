@@ -9,9 +9,10 @@ from PIL import Image
 
 def main(img):
     read_img = np.asarray(Image.open(img))
-    class_encodings = [1, 2, 4, 6, 8, 10, 12]
+    class_encodings = [(1, 'Background'), (2, 'Comment'), (4, 'Decoration'), (6, 'Comment + Decoration'),
+                       (8, 'Main Text'), (10, 'Main Text + Comment'), (12, 'Main Text + Decoration')]
 
-    dest_filename = os.path.join('images', 'viz_' + img)
+    dest_filename = os.path.join('images', 'viz_' + os.path.basename(img))
     if not os.path.exists(os.path.dirname(dest_filename)):
         os.makedirs(os.path.dirname(dest_filename))
 
@@ -23,7 +24,7 @@ def main(img):
 
     # Get boundary pixels and adjust the gt_image for the border pixel -> set to background (1)
     boundary_mask = read_img[:, :, 0].astype(np.uint8) == 128
-    gt_blue[boundary_mask] = 0
+    gt_blue[boundary_mask] = 1
 
     # subtract the boundary pixel from the gt
     boundary_pixel = read_img[:, :, 0].astype(np.uint8) == 128
@@ -34,7 +35,7 @@ def main(img):
     colors = [cmap(i / len(class_encodings), bytes=True)[:3] for i in range(len(class_encodings))]
 
     # Get the mask for each colour
-    masks = {color: (gt_blue == i) > 0 for color, i in zip(colors, class_encodings)}
+    masks = {color: (gt_blue == i[0]) > 0 for color, i in zip(colors, class_encodings)}
 
     # colour the pixels according to the masks
     for c, mask in masks.items():
@@ -62,8 +63,7 @@ def main(img):
     #     img[mask] = color
     #
     # Make and save the class color encoding
-    class_labels = [0, 1, 2, 4, 8, 16]
-    color_encoding = {str(i): color for color, i in zip(colors, class_labels)}
+    color_encoding = {str(i[1]): color for color, i in zip(colors, class_encodings)}
 
     make_colour_legend_image(os.path.join(os.path.dirname(dest_filename), "output_visualizations_colour_legend.png"),
                              color_encoding)
