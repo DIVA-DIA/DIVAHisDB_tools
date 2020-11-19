@@ -1,3 +1,3 @@
 # hisDBViz
 
-```python viz --img <imgname>```
+```python viz.py --img <imgname>```
