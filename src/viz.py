@@ -12,7 +12,7 @@ def main(img):
     class_encodings = [(1, 'Background'), (2, 'Comment'), (4, 'Decoration'), (6, 'Comment + Decoration'),
                        (8, 'Main Text'), (10, 'Main Text + Comment'), (12, 'Main Text + Decoration')]
 
-    dest_filename = os.path.join('images', 'viz_' + os.path.basename(img))
+    dest_filename = os.path.join('images', os.path.basename(img)[:-4], 'viz_' + os.path.basename(img))
     if not os.path.exists(os.path.dirname(dest_filename)):
         os.makedirs(os.path.dirname(dest_filename))
 
