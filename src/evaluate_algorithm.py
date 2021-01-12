@@ -1,6 +1,5 @@
 import argparse
 import itertools
-import os
 import re
 import time
 from multiprocessing import Pool, cpu_count
@@ -11,8 +10,8 @@ import numpy as np
 
 from src.utils.overall_score import write_stats
 
-
 EXTENSIONS_PATTERNS = ['*.png', '*.PNG', '*.jpg', '*.JPG', '*.jpeg']
+
 
 def check_extension(filename, extension_list):
     return any(filename.endswith(extension) for extension in extension_list)
@@ -36,7 +35,6 @@ def get_score(logs, token):
 
 def evaluate(prediction_img_path: Path, gt_img_path: Path, output_path: Path, eval_tool_path: Path,
              original_img_path: Path, no_visualization: bool):
-
     print("Starting: JAR {}".format(prediction_img_path.name))
     command = ['java', '-jar', str(eval_tool_path),
                '-gt', str(gt_img_path),
@@ -118,7 +116,7 @@ def main(gt_folder: Path, prediction_folder: Path, original_images: str, output_
         score = -1
 
     # np.save(os.path.join(output_path, 'results.npy'), results)
-    write_stats(output_path, errors)
+    write_stats(results, errors, score)
     print('Total time taken: {:.2f}, avg_miou={}, nb_errors={}'.format(time.time() - tic, score, len(errors)))
     return score
 
@@ -129,10 +127,12 @@ if __name__ == "__main__":
     # Path folders (evaluator)
     parser.add_argument('--gt_folder', type=Path,
                         required=True,
-                        help='path to folders containing the gt images (e.g. /dataset/CB55/test-page)')
+                        help='path to folders containing the gt images (e.g. /dataset/CB55/test-page).'
+                             ' Will fail if path contains spaces!')
     parser.add_argument('--prediction_folder', type=Path,
                         required=True,
-                        help='path to folders containing prediction images (e.g. /dataset/CB55/test-m)')
+                        help='path to folders containing prediction images (e.g. /dataset/CB55/test-m).'
+                             ' Will fail if path contains spaces!')
     parser.add_argument('--original_images', type=str, default=None,
                         help="Path to the folder containing the original rgb images. If set will create overlap images")
     parser.add_argument('--output_path', type=Path,
