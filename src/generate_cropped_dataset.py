@@ -8,6 +8,7 @@ import logging
 import math
 import os
 import os.path
+from datetime import datetime
 from pathlib import Path
 
 import numpy as np
@@ -162,19 +163,32 @@ class CroppedDatasetGenerator:
                                             progress_title='Cropping "test"')
 
     def write_crops(self):
-        print('Running "CroppedDatasetGenerator":')
-        print(f'  - input_path:       \t{self.input_path}')
-        print(f'  - output_path:      \t{self.output_path}')
-        print(f'  - crop_size_train:  \t{self.crop_size_train}')
-        print(f'  - crop_size_val:    \t{self.crop_size_val}')
-        print(f'  - crop_size_test:   \t{self.crop_size_test}')
-        print(f'  - overlap:          \t{self.overlap}')
-        print(f'  - leading_zeros_len:\t{self.leading_zeros_length}')
-        print(f'  - override_existing:\t{self.override_existing}')
+        info_list = ['Running CroppedDatasetGenerator.write_crops():',
+                     f'- start_time:       \t{datetime.now():%Y-%m-%d_%H-%M-%S}',
+                     f'- input_path:       \t{self.input_path}',
+                     f'- output_path:      \t{self.output_path}',
+                     f'- crop_size_train:  \t{self.crop_size_train}',
+                     f'- crop_size_val:    \t{self.crop_size_val}',
+                     f'- crop_size_test:   \t{self.crop_size_test}',
+                     f'- overlap:          \t{self.overlap}',
+                     f'- leading_zeros_len:\t{self.leading_zeros_length}',
+                     f'- override_existing:\t{self.override_existing}']
+
+        # Write info_cropped_dataset.txt
+        self.output_path.mkdir(parents=True, exist_ok=True)
+        info_file = self.output_path / 'info_cropped_dataset.txt'
+        with info_file.open('a') as f:
+            for info_str in info_list:
+                print(info_str)
+                f.write(f'{info_str}\n')
+
         print(f'Start cropping:')
         self.generator_train.write_crops()
         self.generator_val.write_crops()
         self.generator_test.write_crops()
+
+        with info_file.open('a') as f:
+            f.write(f'- end_time:         \t{datetime.now():%Y-%m-%d_%H-%M-%S}\n\n')
 
 
 class CropGenerator:
@@ -308,7 +322,7 @@ if __name__ == '__main__':
     dataset_generator.write_crops()
 
     # dataset_generator = CroppedDatasetGenerator(input_path=Path('/dataset/DIVA-HisDB/segmentation/CB55'),
-    #                                             output_path=Path('/data/usl_experiments/semantic_segmentation/datasets_cropped/CB55-cropped'),
+    #                                             output_path=Path('/data/usl_experiments/semantic_segmentation/datasets_cropped/CB55'),
     #                                             crop_size_train=300,
     #                                             crop_size_val=300,
     #                                             crop_size_test=256,
