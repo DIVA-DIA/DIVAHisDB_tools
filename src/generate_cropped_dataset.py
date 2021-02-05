@@ -2,11 +2,11 @@
 Load a dataset of historic documents by specifying the folder where its located.
 """
 
+import argparse
 # Utils
 import itertools
 import logging
 import math
-import argparse
 from datetime import datetime
 from pathlib import Path
 
@@ -138,8 +138,6 @@ class CroppedDatasetGenerator:
         self.leading_zeros_length = leading_zeros_length
 
         self.override_existing = override_existing
-
-        self.output_path.mkdir(parents=True, exist_ok=True)
 
         self.generator_train = CropGenerator(input_path=input_path / 'train',
                                              output_path=output_path / 'train',
