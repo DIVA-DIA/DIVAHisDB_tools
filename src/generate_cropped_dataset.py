@@ -16,12 +16,8 @@ from torchvision.transforms import functional as F
 from torchvision.utils import save_image
 from tqdm import tqdm
 
-try:
-    import accimage
-except ImportError:
-    accimage = None
-
 IMG_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.ppm', '.bmp', '.pgm']
+
 
 def has_extension(filename, extensions):
     """Checks if a file is an allowed extension.
@@ -130,8 +126,8 @@ class ToTensorSlidingWindowCrop(object):
 
 
 class CroppedDatasetGenerator:
-    def __init__(self, input_path, output_path, crop_size_train, crop_size_val, crop_size_test, overlap=0.5, leading_zeros_length=4,
-                 override_existing=False):
+    def __init__(self, input_path, output_path, crop_size_train, crop_size_val, crop_size_test, overlap=0.5,
+                 leading_zeros_length=4, override_existing=False):
         # Init list
         self.input_path = input_path
         self.output_path = output_path
@@ -166,6 +162,16 @@ class CroppedDatasetGenerator:
                                             progress_title='Cropping "test"')
 
     def write_crops(self):
+        print('Running "CroppedDatasetGenerator":')
+        print(f'  - input_path:       \t{self.input_path}')
+        print(f'  - output_path:      \t{self.output_path}')
+        print(f'  - crop_size_train:  \t{self.crop_size_train}')
+        print(f'  - crop_size_val:    \t{self.crop_size_val}')
+        print(f'  - crop_size_test:   \t{self.crop_size_test}')
+        print(f'  - overlap:          \t{self.overlap}')
+        print(f'  - leading_zeros_len:\t{self.leading_zeros_length}')
+        print(f'  - override_existing:\t{self.override_existing}')
+        print(f'Start cropping:')
         self.generator_train.write_crops()
         self.generator_val.write_crops()
         self.generator_test.write_crops()
@@ -290,18 +296,19 @@ class CropGenerator:
 
 
 if __name__ == '__main__':
-    dataset_generator = CroppedDatasetGenerator(input_path=Path('/dataset/DIVA-HisDB/segmentation/CB55-10-segmentation'),
-                                                output_path=Path('/home/paul/CroppedDatasetTest/CB55-10-segmentation'),
-                                                crop_size_train=300,
-                                                crop_size_val=300,
-                                                crop_size_test=256,
-                                                overlap=0.5,
-                                                leading_zeros_length=4,
-                                                override_existing=True)
+    dataset_generator = CroppedDatasetGenerator(
+        input_path=Path('/dataset/DIVA-HisDB/segmentation/CB55-10-segmentation'),
+        output_path=Path('/data/usl_experiments/semantic_segmentation/datasets_cropped/CB55-10-segmentation'),
+        crop_size_train=300,
+        crop_size_val=300,
+        crop_size_test=256,
+        overlap=0.5,
+        leading_zeros_length=4,
+        override_existing=True)
     dataset_generator.write_crops()
 
     # dataset_generator = CroppedDatasetGenerator(input_path=Path('/dataset/DIVA-HisDB/segmentation/CB55'),
-    #                                             output_path=Path('/home/paul/CroppedDatasetTest/CB55-cropped'),
+    #                                             output_path=Path('/data/usl_experiments/semantic_segmentation/datasets_cropped/CB55-cropped'),
     #                                             crop_size_train=300,
     #                                             crop_size_val=300,
     #                                             crop_size_test=256,
