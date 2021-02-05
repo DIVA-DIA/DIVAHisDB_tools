@@ -6,8 +6,6 @@ Load a dataset of historic documents by specifying the folder where its located.
 import itertools
 import logging
 import math
-import os
-import os.path
 from datetime import datetime
 from pathlib import Path
 
@@ -80,22 +78,22 @@ def get_gt_data_paths(directory):
     """
 
     paths = []
-    directory = os.path.expanduser(directory)
+    directory = Path(directory).expanduser()
 
-    path_imgs = os.path.join(directory, "data")
-    path_gts = os.path.join(directory, "gt")
+    path_imgs = Path(directory) / "data"
+    path_gts = Path(directory) / "gt"
 
-    if not (os.path.isdir(path_imgs) or os.path.isdir(path_gts)):
+    if not (path_imgs.is_dir() or path_gts.is_dir()):
         logging.error("folder data or gt not found in " + str(directory))
 
-    for img_name, gt_name in zip(sorted(os.listdir(path_imgs)), sorted(os.listdir(path_gts))):
-        assert has_extension(img_name, IMG_EXTENSIONS) == has_extension(gt_name, IMG_EXTENSIONS), \
+    for img_name, gt_name in zip(sorted(path_imgs.iterdir()), sorted(path_gts.iterdir())):
+        assert has_extension(str(img_name), IMG_EXTENSIONS) == has_extension(str(gt_name), IMG_EXTENSIONS), \
             'get_gt_data_paths(): image file aligned with non-image file'
 
-        if has_extension(img_name, IMG_EXTENSIONS) and has_extension(gt_name, IMG_EXTENSIONS):
-            assert os.path.splitext(img_name)[0] == os.path.splitext(gt_name)[0], \
+        if has_extension(str(img_name), IMG_EXTENSIONS) and has_extension(str(gt_name), IMG_EXTENSIONS):
+            assert img_name.suffix[0] == gt_name.suffix[0], \
                 'get_gt_data_paths(): mismatch between data filename and gt filename'
-            paths.append((os.path.join(path_imgs, img_name), os.path.join(path_gts, gt_name)))
+            paths.append((path_imgs / img_name, path_gts / gt_name))
 
     return paths
 
@@ -225,13 +223,14 @@ class CropGenerator:
             coordinates = (x, y)
 
             img_full_name = self.img_names_sizes[img_index][0]
-            img_name = os.path.splitext(img_full_name)[0]
+            img_full_name = Path(img_full_name)
+            img_name = img_full_name.stem
             dest_folder_data = self.output_path / 'data' / img_name
             dest_folder_gt = self.output_path / 'gt' / img_name
             dest_folder_data.mkdir(parents=True, exist_ok=True)
             dest_folder_gt.mkdir(parents=True, exist_ok=True)
 
-            extension = os.path.splitext(img_full_name)[1]
+            extension = img_full_name.suffix
             filename = f'{img_name}_x{x:0{self.leading_zeros_length}d}_y{y:0{self.leading_zeros_length}d}{extension}'
 
             dest_filename_data = dest_folder_data / filename
@@ -278,7 +277,7 @@ class CropGenerator:
             gt_img = pil_loader(gt_path)
             # Ensure that data and gt image are of the same size
             assert gt_img.size == data_img.size
-            img_names_sizes.append((os.path.basename(gt_path), data_img.size[::-1]))
+            img_names_sizes.append((gt_path.name, data_img.size[::-1]))
             step_size = self.crop_size * self.overlap
             num_horiz_crops.append(math.ceil((data_img.size[1] - self.crop_size) / step_size + 1))
             num_vert_crops.append(math.ceil((data_img.size[0] - self.crop_size) / step_size + 1))
@@ -313,8 +312,8 @@ class CropGenerator:
 
 if __name__ == '__main__':
     dataset_generator = CroppedDatasetGenerator(
-        input_path=Path('/dataset/DIVA-HisDB/segmentation/CB55-10-segmentation'),
-        output_path=Path('/data/usl_experiments/semantic_segmentation/datasets_cropped/CB55-10-segmentation'),
+        input_path=Path('/Users/voegtlil/Documents/04_Datasets/003-DataSet/CB55-10-segmentation'),
+        output_path=Path('/Users/voegtlil/Desktop/fun'),
         crop_size_train=300,
         crop_size_val=300,
         crop_size_test=256,
