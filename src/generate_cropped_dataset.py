@@ -173,14 +173,13 @@ class CroppedDatasetGenerator:
                      f'- overlap:          \t{self.overlap}',
                      f'- leading_zeros_len:\t{self.leading_zeros_length}',
                      f'- override_existing:\t{self.override_existing}']
+        print('\n'.join(info_list))
 
         # Write info_cropped_dataset.txt
         self.output_path.mkdir(parents=True, exist_ok=True)
         info_file = self.output_path / 'info_cropped_dataset.txt'
         with info_file.open('a') as f:
-            for info_str in info_list:
-                print(info_str)
-                f.write(f'{info_str}\n')
+            f.writelines(info_list)
 
         print(f'Start cropping:')
         self.generator_train.write_crops()
@@ -321,12 +320,13 @@ if __name__ == '__main__':
         override_existing=True)
     dataset_generator.write_crops()
 
-    # dataset_generator = CroppedDatasetGenerator(input_path=Path('/dataset/DIVA-HisDB/segmentation/CB55'),
-    #                                             output_path=Path('/data/usl_experiments/semantic_segmentation/datasets_cropped/CB55'),
-    #                                             crop_size_train=300,
-    #                                             crop_size_val=300,
-    #                                             crop_size_test=256,
-    #                                             overlap=0.5,
-    #                                             leading_zeros_length=4,
-    #                                             override_existing=False)
+    # dataset_generator = CroppedDatasetGenerator(
+    #     input_path=Path('/dataset/DIVA-HisDB/segmentation/CB55'),
+    #     output_path=Path('/data/usl_experiments/semantic_segmentation/datasets_cropped/CB55'),
+    #     crop_size_train=300,
+    #     crop_size_val=300,
+    #     crop_size_test=256,
+    #     overlap=0.5,
+    #     leading_zeros_length=4,
+    #     override_existing=False)
     # dataset_generator.write_crops()
