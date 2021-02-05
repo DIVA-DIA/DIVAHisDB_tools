@@ -6,6 +6,7 @@ Load a dataset of historic documents by specifying the folder where its located.
 import itertools
 import logging
 import math
+import argparse
 from datetime import datetime
 from pathlib import Path
 
@@ -125,7 +126,7 @@ class ToTensorSlidingWindowCrop(object):
 
 
 class CroppedDatasetGenerator:
-    def __init__(self, input_path, output_path, crop_size_train, crop_size_val, crop_size_test, overlap=0.5,
+    def __init__(self, input_path: Path, output_path, crop_size_train, crop_size_val, crop_size_test, overlap=0.5,
                  leading_zeros_length=4, override_existing=False):
         # Init list
         self.input_path = input_path
@@ -137,6 +138,8 @@ class CroppedDatasetGenerator:
         self.leading_zeros_length = leading_zeros_length
 
         self.override_existing = override_existing
+
+        self.output_path.mkdir(parents=True, exist_ok=True)
 
         self.generator_train = CropGenerator(input_path=input_path / 'train',
                                              output_path=output_path / 'train',
@@ -311,16 +314,54 @@ class CropGenerator:
 
 
 if __name__ == '__main__':
-    dataset_generator = CroppedDatasetGenerator(
-        input_path=Path('/Users/voegtlil/Documents/04_Datasets/003-DataSet/CB55-10-segmentation'),
-        output_path=Path('/Users/voegtlil/Desktop/fun'),
-        crop_size_train=300,
-        crop_size_val=300,
-        crop_size_test=256,
-        overlap=0.5,
-        leading_zeros_length=4,
-        override_existing=True)
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-i', '--input_path',
+                        help='Path to the root folder of the dataset (contains train/val/test)',
+                        type=Path,
+                        required=True)
+    parser.add_argument('-o', '--output_path',
+                        help='Path to the output folder',
+                        type=Path,
+                        required=True)
+    parser.add_argument('-tr', '--crop_size_train',
+                        help='Size of the crops in the training set',
+                        type=int,
+                        required=True)
+    parser.add_argument('-v', '--crop_size_val',
+                        help='Size of the crops in the validation set',
+                        type=int,
+                        required=True)
+    parser.add_argument('-te', '--crop_size_test',
+                        help='Size of the crops in the test set',
+                        type=int,
+                        required=True)
+    parser.add_argument('-ov', '--overlap',
+                        help='Overlap of the different crops (between 0-1)',
+                        type=float,
+                        default=0.5)
+    parser.add_argument('-l', '--leading_zeros_length',
+                        help='amount of leading zeros to encode the coordinates',
+                        type=int,
+                        default=4)
+    parser.add_argument('-oe', '--override_existing',
+                        help='If true overrides the images ',
+                        type=bool,
+                        default=False)
+    args = parser.parse_args()
+    dataset_generator = CroppedDatasetGenerator(**args.__dict__)
     dataset_generator.write_crops()
+
+    # example call arguments
+    # -i
+    # /Users/voegtlil/Documents/04_Datasets/003-DataSet/CB55-10-segmentation
+    # -o
+    # /Users/voegtlil/Desktop/fun
+    # -tr
+    # 300
+    # -v
+    # 300
+    # -te
+    # 256
 
     # dataset_generator = CroppedDatasetGenerator(
     #     input_path=Path('/dataset/DIVA-HisDB/segmentation/CB55'),
