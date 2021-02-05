@@ -172,14 +172,17 @@ class CroppedDatasetGenerator:
                      f'- crop_size_test:   \t{self.crop_size_test}',
                      f'- overlap:          \t{self.overlap}',
                      f'- leading_zeros_len:\t{self.leading_zeros_length}',
-                     f'- override_existing:\t{self.override_existing}']
-        print('\n'.join(info_list))
+                     f'- override_existing:\t{self.override_existing}',
+                     '']  # empty string to get linebreak at the end when using join
+
+        info_str = '\n'.join(info_list)
+        print(info_str)
 
         # Write info_cropped_dataset.txt
         self.output_path.mkdir(parents=True, exist_ok=True)
         info_file = self.output_path / 'info_cropped_dataset.txt'
         with info_file.open('a') as f:
-            f.writelines(info_list)
+            f.write(info_str)
 
         print(f'Start cropping:')
         self.generator_train.write_crops()
